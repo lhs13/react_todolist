@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import TodoListTemplate from './components/TodoListTemplate';
 import Form from './components/Form';
 import TodoItemList from './components/TodoItemList';
+import Palette from './components/Palette';
+
+const colors = ['#343a40', '#f03e3e', '#12b886', '#228ae6'];
 
 class App extends Component{
 
@@ -10,10 +13,11 @@ class App extends Component{
   state={
     input : '',
     todos : [
-      {id : 0, text : '리액트 소개', checked: false},
-      {id : 1, text : '리액트 소개', checked: true},
-      {id : 2, text : '리액스 소개', checked: false}
-    ]
+      {id : 0, text : '예시1', checked: true},
+      {id : 1, text : '예시2', checked: false},
+      {id : 2, text : '예시3', checked: false}
+    ],
+    color: '#343a40'
   }
 
   handleChange = (e) => {
@@ -23,16 +27,16 @@ class App extends Component{
   }
 
   handleCreate = () => {
-    const {input, todos} = this.state;
+    const {input, todos, color} = this.state;
 
-    let arrayOne = [];
-    let arrayTwo = arrayOne.concat(1);
-    console.log(arrayOne === arrayTwo); //false
+    // let arrayOne = [];
+    // let arrayTwo = arrayOne.concat(1);
+    // console.log(arrayOne === arrayTwo); //false
 
-    let array = [{value:1}, {value:2}];
-    let nextArray = array;
-    nextArray[0].value = 10;
-    console.log(array === nextArray) //true
+    // let array = [{value:1}, {value:2}];
+    // let nextArray = array;
+    // nextArray[0].value = 10;
+    // console.log(array === nextArray) //true
 
     this.setState({
       input : '', //input 비우고
@@ -40,7 +44,8 @@ class App extends Component{
       todos : todos.concat({
         id : this.id++,
         text : input,
-        checked : false
+        checked : false,
+        color
       })
     });
   }
@@ -59,23 +64,16 @@ class App extends Component{
     const index = todos.findIndex(todo => todo.id === id);
     const selected = todos[index]; //선택한 객체
 
-    this.setState({
-      todos:[
-        ...todos.slice(0, index),
-        {...selected, checked: !selected.checked},
-        ...todos.slice(index+1, todos.length)
-      ]
-    });
+    const nextTodos = [...todos]; //배열 복사
 
-    const nextTodos = [...todos]; //배열을 복사
-
-    //기존 값들을 복사하고 checked 값을 덮어쓰기
+    //기존 값들을 복사하고 checked 값 덮어쓰기
     nextTodos[index] = {
       ...selected,
       checked : !selected.checked
     };
+
     this.setState({
-      todos : nextTodos
+      todos:nextTodos
     });
   }
 
@@ -86,10 +84,16 @@ class App extends Component{
     });
   }
 
+  handleSelectColor = (color) => {
+    this.setState({
+      color
+    })
+  }
+
   render(){
-    const {input, todos} = this.state;
+    const {input, todos, color} = this.state;
     const{
-      handleChange, handleCreate, handleKeyPress, handleToggle, handleRemove
+      handleChange, handleCreate, handleKeyPress, handleToggle, handleRemove, handleSelectColor
     } = this;
 
     return(
@@ -99,8 +103,12 @@ class App extends Component{
           onKeyPress = {handleKeyPress}
           onChange = {handleChange}
           onCreate = {handleCreate}
+          color = {color}
         />
-      )}>
+      )}
+        palette = {(
+          <Palette colors={colors} selected={color} onSelect={handleSelectColor}/>
+        )}>
         <TodoItemList todos={todos} onToggle={handleToggle} onRemove={handleRemove}/>
       </TodoListTemplate>
     );
